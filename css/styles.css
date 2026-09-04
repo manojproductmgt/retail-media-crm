@@ -679,6 +679,190 @@ button { cursor: pointer; font-family: var(--font); }
   color: var(--navy-900);
 }
 
+.offer-btn-accept {
+  background: var(--mint);
+  color: var(--navy-900);
+  border-color: var(--mint);
+  font-weight: 700;
+}
+
+.offer-btn-accept:hover {
+  background: #3BD4B0;
+  color: var(--navy-900);
+}
+
+/* ── Scope Badges ───────────────────────────────────────── */
+
+.scope-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--dim);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.2;
+}
+
+.scope-badge-v1 {
+  color: var(--mint);
+  border: 1px solid rgba(79, 227, 193, 0.35);
+}
+
+.scope-badge-phase {
+  color: var(--muted);
+}
+
+/* ── Adjust Interaction (Brand Detail) ──────────────────── */
+
+.adjust-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(30, 36, 80, 0.6);
+  border: 1px dashed var(--dim);
+  border-radius: var(--radius-sm);
+  margin-top: 14px;
+}
+
+.adjust-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: 1px solid var(--mint);
+  color: var(--mint);
+  font-size: var(--fs-small);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.adjust-toggle-btn:hover {
+  background: var(--mint-dim);
+}
+
+.adjust-panel {
+  background: var(--navy-700);
+  border: 1px solid var(--dim);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-top: 12px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.adjust-field {
+  margin-bottom: 12px;
+}
+
+.adjust-field:last-child {
+  margin-bottom: 0;
+}
+
+.adjust-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--fs-small);
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.adjust-select {
+  width: 100%;
+  background: var(--navy-800);
+  border: 1px solid var(--dim);
+  border-radius: var(--radius-sm);
+  color: var(--white);
+  padding: 8px 12px;
+  font-size: var(--fs-table);
+  font-family: var(--font);
+  cursor: pointer;
+}
+
+.adjust-select:focus {
+  border-color: var(--mint);
+  outline: none;
+}
+
+.adjust-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.adjust-slider {
+  flex: 1;
+  accent-color: var(--mint);
+  cursor: pointer;
+}
+
+.adjust-slider-val {
+  font-weight: 700;
+  color: var(--mint);
+  font-size: var(--fs-body);
+  min-width: 90px;
+  text-align: right;
+}
+
+/* ── Handover Card Flip ────────────────────────────────── */
+
+.handover-card {
+  background: var(--navy-800);
+  border: 1px solid var(--mint);
+  border-radius: var(--radius);
+  padding: 24px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.api-spec-block {
+  background: var(--navy-900);
+  border: 1px solid var(--dim);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: 'SF Mono', Consolas, Menlo, monospace;
+  font-size: 12px;
+  color: #c9d1d9;
+  line-height: 1.6;
+  margin-top: 12px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.api-spec-key {
+  color: var(--purple);
+  font-weight: 600;
+}
+
+.api-spec-str {
+  color: var(--mint);
+}
+
+.api-spec-num {
+  color: #FFA657;
+}
+
+.handover-quote {
+  padding: 14px 16px;
+  background: rgba(79, 227, 193, 0.06);
+  border-left: 3px solid var(--mint);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--fs-small);
+  color: var(--white);
+  line-height: 1.5;
+  margin-top: 14px;
+}
+
 /* Empty state */
 .empty-state {
   padding: 24px;

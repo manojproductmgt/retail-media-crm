@@ -16,11 +16,49 @@ import {
   formatDate,
 } from '../data/seed.js';
 
+// ── Placement Specs for Live Adjust Interaction ──────────────
+
+const placementSpecs = {
+  search: {
+    id: 'slot_search_top_01',
+    name: 'Grocery Search Top Slot',
+    pricingModel: 'CPC',
+    rate: 8,
+    isConstrained: false,
+    inventoryNote: null,
+    availabilityText: 'Search Top Slot: 38% unsold in this window — 8 of 21 slots open',
+    ctr: 0.04,
+    baseROAS: 5.4,
+  },
+  homepage: {
+    id: 'slot_hp_hero_display_01',
+    name: 'Homepage Display Banner',
+    pricingModel: 'CPM',
+    rate: 220,
+    isConstrained: true,
+    inventoryNote: 'Homepage display: 94% sold in this window — 2 of 21 slots available',
+    availabilityText: 'Homepage display: 94% sold in this window — 2 of 21 slots available',
+    ctr: 0.015,
+    baseROAS: 3.2,
+  },
+  crosssell: {
+    id: 'slot_pdp_reorder_cross_02',
+    name: 'Cart & Reorder Cross-Sell',
+    pricingModel: 'CPC',
+    rate: 6,
+    isConstrained: false,
+    inventoryNote: null,
+    availabilityText: 'Cart Cross-sell: 55% unsold in this window — 12 of 21 slots available',
+    ctr: 0.05,
+    baseROAS: 6.2,
+  },
+};
+
 // ── Application State ────────────────────────────────────────
 
 const state = {
   currentScreen: 'coverage', // 'coverage' | 'brand-detail' | 'pipeline' | 'routing'
-  selectedBrandId: 'cadbury',
+  selectedBrandId: 'amul',
   filters: {
     adStatus: 'all',
     route: 'all',
@@ -34,6 +72,12 @@ const state = {
   pipelineSort: {
     column: 'value',
     direction: 'desc',
+  },
+  adjust: {
+    isOpen: true, // Visible by default for live demonstration
+    placement: 'search',
+    budget: null,
+    isAccepted: false,
   },
   notification: null,
 };
@@ -123,7 +167,7 @@ function showToast(message) {
   }, 3000);
 }
 
-// ── Screen 1: Coverage ───────────────────────────────────────
+// ── Screen 1: Coverage (Badge: V1) ───────────────────────────
 
 function renderCoverageScreen() {
   // Apply filtering
@@ -156,11 +200,19 @@ function renderCoverageScreen() {
 
   return `
     <div class="screen-enter">
-      <!-- Screen Header -->
-      <div class="page-title">Coverage</div>
-      <div class="page-subtitle">Full catalogue opportunity radar & autonomous routing engine</div>
+      <!-- Screen Header with Scope Badge -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+        <div>
+          <div class="page-title">Coverage</div>
+          <div class="page-subtitle" style="margin-bottom:20px;">
+            Full catalogue opportunity radar & autonomous routing engine · 
+            <span style="color:var(--white);">North Star: conversion rate on generated opportunities</span>
+          </div>
+        </div>
+        <span class="scope-badge scope-badge-v1">V1</span>
+      </div>
 
-      <!-- Top Stat Strip -->
+      <!-- Top Stat Strip (Activation Led) -->
       <div class="stat-strip">
         <div class="stat-card card-mint">
           <div class="stat-card-label" style="color:var(--mint);">Newly activated this quarter</div>
@@ -247,6 +299,7 @@ function renderCoverageScreen() {
                         <span class="dot-mint" title="Opportunity present"></span>
                         <div>
                           <div class="brand-name-cell">${b.name}</div>
+                          ${b.resolvedVariants ? `<div style="font-size:10px; color:var(--purple); margin-top:1px;">${b.resolvedVariants}</div>` : ''}
                           <div class="brand-category-cell">${b.category}</div>
                         </div>
                       </div>
@@ -282,22 +335,51 @@ function renderCoverageScreen() {
   `;
 }
 
-// ── Screen 2: Brand Detail ───────────────────────────────────
+// ── Screen 2: Brand Detail (Badge: V1, Adjust loop: Phase 2) ─
 
 function renderBrandDetailScreen() {
   const brand = getBrandById(state.selectedBrandId) || brands[0];
   const { generatedOffer, signalInputs } = brand;
+
+  // Initialize adjust budget if not set
+  if (state.adjust.budget === null) {
+    state.adjust.budget = generatedOffer.totalBudget;
+  }
+
+  const currentPlacementKey = state.adjust.placement || 'search';
+  const currentSpec = placementSpecs[currentPlacementKey];
+  const currentBudget = state.adjust.budget;
+  const currentRate = currentSpec.rate;
+  const currentPricingModel = currentSpec.pricingModel;
+
+  // Live calculation of yield, volume, and forecast
+  let estImpressions, estClicks, estROAS, estAttributedSales;
+  if (currentPricingModel === 'CPM') {
+    estImpressions = Math.round((currentBudget / currentRate) * 1000);
+    estClicks = Math.round(estImpressions * currentSpec.ctr);
+  } else {
+    estClicks = Math.round(currentBudget / currentRate);
+    estImpressions = Math.round(estClicks / currentSpec.ctr);
+  }
+  estROAS = currentSpec.baseROAS;
+  estAttributedSales = Math.round(currentBudget * estROAS);
 
   const trendSign = brand.searchTrend >= 0 ? `+${brand.searchTrend}%` : `${brand.searchTrend}%`;
   const trendClass = brand.searchTrend >= 0 ? 'trend-positive' : 'trend-negative';
 
   return `
     <div class="screen-enter">
-      <!-- Back button -->
-      <button class="back-btn" id="btn-back-coverage">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>Back to Coverage table</span>
-      </button>
+      <!-- Back button and Scope Badges -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <button class="back-btn" id="btn-back-coverage" style="margin-bottom:0;">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 13L5 8L10 3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span>Back to Coverage table</span>
+        </button>
+        <div style="display:flex; gap:8px;">
+          <span class="scope-badge scope-badge-v1">V1</span>
+          <span class="scope-badge scope-badge-phase">Adjust loop: Phase 2</span>
+        </div>
+      </div>
 
       <!-- Brand Header -->
       <div class="brand-header">
@@ -307,7 +389,10 @@ function renderBrandDetailScreen() {
             ${getAdStatusPill(brand.adStatus)}
             ${getRoutePill(brand.route)}
           </div>
-          <div class="brand-header-category">${brand.category} · Platform Seller</div>
+          <div class="brand-header-category">
+            ${brand.category} · Platform Seller
+            ${brand.resolvedVariants ? `<span style="color:var(--purple); margin-left:8px;">(${brand.resolvedVariants})</span>` : ''}
+          </div>
         </div>
       </div>
 
@@ -434,97 +519,208 @@ function renderBrandDetailScreen() {
           </div>
         </div>
 
-        <!-- Right Column: Generated Offer Card -->
+        <!-- Right Column: Generated Offer & Adjust Loop -->
         <div class="brand-detail-right">
-          <div class="offer-card">
-            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:12px;">
-              <div>
-                <span class="pill pill-generated" style="margin-bottom:8px;">Maestro Generated Proposal</span>
-                <h3 class="offer-package-name">${generatedOffer.packageName}</h3>
+          ${
+            state.adjust.isAccepted
+              ? `
+            <!-- Handover Card Flip State -->
+            <div class="handover-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                <div>
+                  <span class="pill pill-generated" style="margin-bottom:6px;">Campaign API Handover Spec</span>
+                  <h3 style="font-size:18px; font-weight:700; color:var(--white);">Handover → Ad Stack Execution</h3>
+                </div>
+                <span class="pill pill-active" style="font-weight:700;">200 OK · Provisioned</span>
               </div>
-              <div style="text-align:right;">
-                <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Est. Budget</div>
-                <div style="font-size:22px; font-weight:700; color:var(--mint);">${formatINR(generatedOffer.totalBudget)}</div>
+
+              <div style="font-size:12px; color:var(--muted); margin-bottom:8px;">
+                Handing mapped negotiation parameters to <code>POST /api/v2/campaigns/provision</code>:
+              </div>
+
+              <div class="api-spec-block">{
+  <span class="api-spec-key">"advertiser_id"</span>: <span class="api-spec-str">"bb_adv_${brand.id}"</span>,
+  <span class="api-spec-key">"brand_name"</span>: <span class="api-spec-str">"${brand.name}"</span>,
+  <span class="api-spec-key">"campaign_package"</span>: <span class="api-spec-str">"[Maestro] ${currentSpec.name}"</span>,
+  <span class="api-spec-key">"placement_ids"</span>: [<span class="api-spec-str">"${currentSpec.id}"</span>],
+  <span class="api-spec-key">"flight"</span>: {
+    <span class="api-spec-key">"start_date"</span>: <span class="api-spec-str">"2026-10-01"</span>,
+    <span class="api-spec-key">"end_date"</span>: <span class="api-spec-str">"2026-10-28"</span>
+  },
+  <span class="api-spec-key">"budget_inr"</span>: <span class="api-spec-num">${currentBudget}</span>,
+  <span class="api-spec-key">"agreed_pricing"</span>: {
+    <span class="api-spec-key">"pricing_model"</span>: <span class="api-spec-str">"${currentPricingModel}"</span>,
+    <span class="api-spec-key">"rate_inr"</span>: <span class="api-spec-num">${currentRate}</span>,
+    <span class="api-spec-key">"yield_checked"</span>: <span class="api-spec-num">true</span>
+  },
+  <span class="api-spec-key">"targeting"</span>: {
+    <span class="api-spec-key">"category"</span>: <span class="api-spec-str">"${brand.category}"</span>,
+    <span class="api-spec-key">"inventory_allocation"</span>: <span class="api-spec-str">"${currentSpec.isConstrained ? 'CONSTRAINED_RESERVED' : 'STANDARD_SEARCH'}"</span>
+  },
+  <span class="api-spec-key">"status"</span>: <span class="api-spec-str">"READY_FOR_AD_SERVER"</span>
+}</div>
+
+              <div class="handover-quote">
+                <strong>"No AI in this step. Every decision was made during negotiation — the handover is a field mapping."</strong>
+              </div>
+
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+                <button class="offer-btn" id="btn-modify-handover">
+                  ← Modify Proposal / Negotiate
+                </button>
+                <span style="font-size:11px; color:var(--muted);">Dispatched to Ad Server</span>
               </div>
             </div>
-
-            <!-- Placements & Flight -->
-            <div class="offer-section">
-              <div class="offer-section-title">Package Inclusions & Flight</div>
-              <div class="offer-row">
-                <span class="offer-row-label">Flight dates</span>
-                <span class="offer-row-value">${formatDate(generatedOffer.flightStart)} – ${formatDate(generatedOffer.flightEnd)}</span>
+          `
+              : `
+            <!-- Real-time Proposal Card -->
+            <div class="offer-card">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+                <div>
+                  <span class="pill pill-generated" style="margin-bottom:6px;">Maestro Generated Proposal</span>
+                  <h3 class="offer-package-name">${generatedOffer.packageName}</h3>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Agreed Budget</div>
+                  <div style="font-size:22px; font-weight:700; color:var(--mint);">${formatINR(currentBudget)}</div>
+                </div>
               </div>
-              <div class="offer-row">
-                <span class="offer-row-label">Ad placements</span>
-                <span class="offer-row-value" style="text-align:right; max-width:260px;">
-                  ${generatedOffer.placements.join(' · ')}
+
+              <!-- Adjust Control Toggle Bar -->
+              <div class="adjust-bar">
+                <span style="font-size:var(--fs-small); color:var(--muted);">
+                  Live yield & inventory simulation:
                 </span>
+                <button class="adjust-toggle-btn" id="btn-toggle-adjust">
+                  ⚙ ${state.adjust.isOpen ? 'Hide Adjust' : 'Adjust Placement & Budget'}
+                </button>
               </div>
-              <div class="offer-row">
-                <span class="offer-row-label">Pricing structure</span>
-                <span class="offer-row-value">₹${generatedOffer.rate} / ${generatedOffer.pricingModel}</span>
+
+              <!-- Interactive Adjust Panel -->
+              ${
+                state.adjust.isOpen
+                  ? `
+                <div class="adjust-panel">
+                  <div class="adjust-field">
+                    <div class="adjust-label">
+                      <span>Swap Placement</span>
+                      <span style="color:var(--mint); font-weight:400; text-transform:none;">Yield-derived pricing</span>
+                    </div>
+                    <select class="adjust-select" id="adjust-placement-select">
+                      <option value="search" ${currentPlacementKey === 'search' ? 'selected' : ''}>
+                        Grocery Search Top Slot (CPC ₹8 · Available)
+                      </option>
+                      <option value="homepage" ${currentPlacementKey === 'homepage' ? 'selected' : ''}>
+                        Homepage Display Banner (CPM ₹220 · 94% Sold Out)
+                      </option>
+                      <option value="crosssell" ${currentPlacementKey === 'crosssell' ? 'selected' : ''}>
+                        Cart & Reorder Cross-Sell (CPC ₹6 · High Availability)
+                      </option>
+                    </select>
+                  </div>
+
+                  <div class="adjust-field">
+                    <div class="adjust-label">
+                      <span>Adjust Budget</span>
+                      <span class="adjust-slider-val" id="adjust-budget-display">${formatINR(currentBudget)}</span>
+                    </div>
+                    <div class="adjust-slider-row">
+                      <input type="range" class="adjust-slider" id="adjust-budget-slider" min="25000" max="2500000" step="25000" value="${currentBudget}" />
+                    </div>
+                    <div style="display:flex; gap:6px; margin-top:8px;">
+                      <button class="btn-budget-preset offer-btn" style="padding:4px 8px; font-size:11px;" data-val="100000">₹1 L</button>
+                      <button class="btn-budget-preset offer-btn" style="padding:4px 8px; font-size:11px;" data-val="500000">₹5 L</button>
+                      <button class="btn-budget-preset offer-btn" style="padding:4px 8px; font-size:11px;" data-val="850000">₹8.5 L</button>
+                      <button class="btn-budget-preset offer-btn" style="padding:4px 8px; font-size:11px;" data-val="1500000">₹15 L</button>
+                    </div>
+                  </div>
+                </div>
+              `
+                  : ''
+              }
+
+              <!-- Placements & Flight -->
+              <div class="offer-section">
+                <div class="offer-section-title">Package Inclusions & Flight</div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Flight dates</span>
+                  <span class="offer-row-value">${formatDate(generatedOffer.flightStart)} – ${formatDate(generatedOffer.flightEnd)}</span>
+                </div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Ad placement</span>
+                  <span class="offer-row-value" style="color:var(--mint); font-weight:600;">
+                    ${currentSpec.name}
+                  </span>
+                </div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Yield-derived rate</span>
+                  <span class="offer-row-value">₹${currentRate} / ${currentPricingModel}</span>
+                </div>
+              </div>
+
+              <!-- Live Inventory Line (Constrained by availability) -->
+              ${
+                currentSpec.isConstrained
+                  ? `
+                <div class="offer-inventory-note">
+                  <div style="font-weight:700; margin-bottom:2px;">Live Inventory Constraint</div>
+                  <div>${currentSpec.availabilityText}</div>
+                </div>
+              `
+                  : `
+                <div class="offer-inventory-note" style="background:rgba(79, 227, 193, 0.08); color:var(--mint);">
+                  <div style="font-weight:700; margin-bottom:2px;">Inventory Allocation Confirmed</div>
+                  <div>${currentSpec.availabilityText}</div>
+                </div>
+              `
+              }
+
+              <!-- Performance Forecast -->
+              <div class="offer-section">
+                <div class="offer-section-title">Recalculated Algorithmic Forecast</div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Est. impressions</span>
+                  <span class="offer-row-value">${(estImpressions / 100000).toFixed(1)} Lakh</span>
+                </div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Est. clicks</span>
+                  <span class="offer-row-value">${estClicks.toLocaleString('en-IN')}</span>
+                </div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Target ROAS</span>
+                  <span class="offer-row-value" style="color:var(--mint); font-weight:700;">${estROAS}×</span>
+                </div>
+                <div class="offer-row">
+                  <span class="offer-row-label">Est. attributed GMV</span>
+                  <span class="offer-row-value" style="color:var(--mint); font-weight:700;">${formatINR(estAttributedSales)}</span>
+                </div>
+              </div>
+
+              <!-- Dispatch Action Buttons & Acceptance Handover -->
+              <div class="offer-actions" style="margin-top:16px;">
+                <button class="offer-btn offer-btn-accept" id="btn-brand-accepted" title="Click to trigger Campaign API field handover">
+                  Brand accepted → Handover
+                </button>
+                <button class="offer-btn" id="btn-action-rep" data-action="rep">
+                  Send to rep
+                </button>
+                <button class="offer-btn" id="btn-action-nurture" data-action="nurture">
+                  Route to nurture
+                </button>
+                <button class="offer-btn" id="btn-action-selfserve" data-action="selfserve">
+                  Invite to self-serve
+                </button>
               </div>
             </div>
-
-            <!-- Performance Forecast -->
-            <div class="offer-section">
-              <div class="offer-section-title">Algorithmic Forecast</div>
-              <div class="offer-row">
-                <span class="offer-row-label">Est. impressions</span>
-                <span class="offer-row-value">${(generatedOffer.estImpressions / 100000).toFixed(1)} Lakh</span>
-              </div>
-              <div class="offer-row">
-                <span class="offer-row-label">Est. clicks</span>
-                <span class="offer-row-value">${generatedOffer.estClicks.toLocaleString('en-IN')}</span>
-              </div>
-              <div class="offer-row">
-                <span class="offer-row-label">Target ROAS</span>
-                <span class="offer-row-value" style="color:var(--mint); font-weight:700;">${generatedOffer.estROAS}×</span>
-              </div>
-              <div class="offer-row">
-                <span class="offer-row-label">Est. attributed GMV</span>
-                <span class="offer-row-value" style="color:var(--mint); font-weight:700;">${formatINR(generatedOffer.estAttributedSales)}</span>
-              </div>
-            </div>
-
-            <!-- Live Inventory Line (Constrained by availability) -->
-            ${
-              generatedOffer.inventoryNote
-                ? `
-              <div class="offer-inventory-note">
-                <div style="font-weight:700; margin-bottom:2px;">Live Inventory Constraint</div>
-                <div>${generatedOffer.inventoryNote}</div>
-              </div>
-            `
-                : `
-              <div class="offer-inventory-note" style="background:rgba(79, 227, 193, 0.08); color:var(--mint);">
-                <div style="font-weight:700; margin-bottom:2px;">Inventory Allocation Confirmed</div>
-                <div>All slots reserved from unallocated search pool (38% inventory available).</div>
-              </div>
-            `
-            }
-
-            <!-- Dispatch Action Buttons -->
-            <div class="offer-actions">
-              <button class="offer-btn offer-btn-primary" id="btn-action-rep" data-action="rep">
-                Send to rep
-              </button>
-              <button class="offer-btn" id="btn-action-nurture" data-action="nurture">
-                Route to nurture
-              </button>
-              <button class="offer-btn" id="btn-action-selfserve" data-action="selfserve">
-                Invite to self-serve
-              </button>
-            </div>
-          </div>
+          `
+          }
         </div>
       </div>
     </div>
   `;
 }
 
-// ── Screen 3: Pipeline ───────────────────────────────────────
+// ── Screen 3: Pipeline (Badge: Phase 4) ───────────────────────
 
 function renderPipelineScreen() {
   const { target, committed, bestCase, pipeline } = pipelineForecast;
@@ -553,11 +749,16 @@ function renderPipelineScreen() {
 
   return `
     <div class="screen-enter">
-      <!-- Screen Header with View Toggle -->
+      <!-- Screen Header with View Toggle & Scope Badge -->
       <div class="pipeline-header">
         <div>
-          <div class="page-title">Pipeline</div>
-          <div class="page-subtitle">Platform-generated ad sales deals & rep forecast</div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
+            <div class="page-title" style="margin-bottom:0;">Pipeline</div>
+            <span class="scope-badge scope-badge-phase">Phase 4</span>
+          </div>
+          <div class="page-subtitle" style="margin-top:2px; margin-bottom:0;">
+            Platform-generated ad sales deals & rep forecast · Deliberately post-V1
+          </div>
         </div>
         <div class="view-toggle">
           <button class="view-toggle-btn ${state.pipelineView === 'kanban' ? 'active' : ''}" id="toggle-kanban">
@@ -696,20 +897,22 @@ function renderPipelineScreen() {
   `;
 }
 
-// ── Screen 4: Routing (The Dispatch View) ─────────────────────
+// ── Screen 4: Routing (Badge: Concept) ────────────────────────
 
 function renderRoutingScreen() {
   const { decisions, destinations, inboundTasks, cohortFunnel } = routingSnapshot;
 
   return `
     <div class="screen-enter">
-      <!-- Screen Header with Concept Tag -->
-      <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
-        <div class="page-title">Routing Engine</div>
-        <span class="pill pill-concept">Concept Architecture</span>
-      </div>
-      <div class="page-subtitle">
-        Maestro executes nothing. It decides. Other systems do the work — Maestro determines who fires today based on catalogue signals.
+      <!-- Screen Header with Concept Scope Badge -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <div>
+          <div class="page-title">Routing Engine</div>
+          <div class="page-subtitle">
+            Maestro executes nothing. It decides. Other systems do the work — Maestro determines who fires today based on catalogue signals.
+          </div>
+        </div>
+        <span class="scope-badge scope-badge-phase">Concept</span>
       </div>
 
       <!-- 4-Column Flow Layout -->
@@ -797,7 +1000,7 @@ function renderRoutingScreen() {
           </div>
         </div>
 
-        <!-- Column 4: Did It Work -->
+        <!-- Column 4: Did It Work (Last Quarter's Funnel) -->
         <div class="routing-column">
           <div class="routing-column-header">4. Did It Work</div>
 
@@ -928,6 +1131,10 @@ function bindCoverageEvents() {
       const brandId = row.getAttribute('data-brand-id');
       if (brandId) {
         state.selectedBrandId = brandId;
+        state.adjust.isAccepted = false;
+        state.adjust.placement = 'search';
+        const brand = getBrandById(brandId) || brands[0];
+        state.adjust.budget = brand.generatedOffer.totalBudget;
         state.currentScreen = 'brand-detail';
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -943,6 +1150,66 @@ function bindBrandDetailEvents() {
       state.currentScreen = 'coverage';
       render();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // Toggle Adjust panel
+  const toggleAdjustBtn = document.getElementById('btn-toggle-adjust');
+  if (toggleAdjustBtn) {
+    toggleAdjustBtn.addEventListener('click', () => {
+      state.adjust.isOpen = !state.adjust.isOpen;
+      render();
+    });
+  }
+
+  // Placement swap
+  const placementSelect = document.getElementById('adjust-placement-select');
+  if (placementSelect) {
+    placementSelect.addEventListener('change', (e) => {
+      state.adjust.placement = e.target.value;
+      render();
+    });
+  }
+
+  // Budget slider
+  const budgetSlider = document.getElementById('adjust-budget-slider');
+  if (budgetSlider) {
+    budgetSlider.addEventListener('input', (e) => {
+      state.adjust.budget = parseInt(e.target.value, 10);
+      const display = document.getElementById('adjust-budget-display');
+      if (display) display.innerText = formatINR(state.adjust.budget);
+    });
+    budgetSlider.addEventListener('change', (e) => {
+      state.adjust.budget = parseInt(e.target.value, 10);
+      render();
+    });
+  }
+
+  // Budget quick presets
+  document.querySelectorAll('.btn-budget-preset').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = parseInt(btn.getAttribute('data-val'), 10);
+      state.adjust.budget = val;
+      render();
+    });
+  });
+
+  // Brand accepted → Handover state change
+  const brandAcceptedBtn = document.getElementById('btn-brand-accepted');
+  if (brandAcceptedBtn) {
+    brandAcceptedBtn.addEventListener('click', () => {
+      state.adjust.isAccepted = true;
+      render();
+      showToast('Campaign API handover spec provisioned');
+    });
+  }
+
+  // Reset from handover back to modify
+  const modifyHandoverBtn = document.getElementById('btn-modify-handover');
+  if (modifyHandoverBtn) {
+    modifyHandoverBtn.addEventListener('click', () => {
+      state.adjust.isAccepted = false;
+      render();
     });
   }
 
@@ -989,6 +1256,10 @@ function bindPipelineEvents() {
       const brandId = item.getAttribute('data-brand-id');
       if (brandId) {
         state.selectedBrandId = brandId;
+        state.adjust.isAccepted = false;
+        state.adjust.placement = 'search';
+        const brand = getBrandById(brandId) || brands[0];
+        state.adjust.budget = brand.generatedOffer.totalBudget;
         state.currentScreen = 'brand-detail';
         render();
         window.scrollTo({ top: 0, behavior: 'smooth' });

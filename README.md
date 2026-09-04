@@ -10,11 +10,15 @@ Traditional CRMs depend on sales reps manually logging accounts, opportunities, 
 
 **Maestro** inverts this model: **it generates pipeline directly from platform commerce signals rather than relying on reps to type it in.**
 
-Every brand in the catalogue is tracked, scored for advertising opportunity using live marketplace signals (GMV, category search acceleration, unsold ad inventory, historical ROAS), and routed to the optimal treatment:
-- **Named rep** (high GMV / strategic accounts)
-- **Rep-assisted** (mid-tier accounts with drafted proposals ready for review)
-- **Automated nurture** (multi-channel drip campaigns triggered by commerce events)
-- **Self-serve** (low-touch starter packages for tail brands)
+- **North Star Metric:** Conversion rate on generated opportunities — of the brands Maestro surfaced and routed, what share started advertising.
+- **Scope Discipline:** To protect V1 delivery, each screen is clearly badged with its delivery phase:
+
+| Screen | Scope Badge | Strategic Role |
+|---|---|---|
+| **Coverage** | `V1` | Core Hero Radar: Surfaces opportunity across all 3,140 catalogue brands |
+| **Brand Detail** | `V1` *(Adjust loop: `Phase 2`)* | Deep-dive signals + live inventory negotiation and campaign handover |
+| **Pipeline** | `Phase 4` | Answers the "you were asked for a CRM" question (deliberately post-V1) |
+| **Routing** | `Concept` | Proves Maestro decides and conducts rather than executes |
 
 > **Core Concept:** Maestro executes nothing. It decides. Other engines do the work — media planners draft packages, drip engines send offers, self-serve portals book inventory. Maestro determines who fires today, for which brand, based on real platform data.
 
@@ -22,17 +26,25 @@ Every brand in the catalogue is tracked, scored for advertising opportunity usin
 
 ## 2. Interactive Screens
 
-1. **Coverage (Hero Screen):** The screen no competing CRM could render. Leads with activation over raw opportunity (as requested by board and pricing models):
+1. **Coverage (Hero Screen — Badge: `V1`):** The screen no competing CRM could render. Leads with activation over raw opportunity:
    - *Newly activated this quarter:* **47** (brands advertising for the first time)
    - *Active advertisers:* **61 → 108** (1.9% → 3.4% of catalogue brand base)
    - *Coverage opportunity identified:* **₹18.4 Cr** (next 90 days)
    - *Inventory unsold this week:* **38%** (grocery search, weekdays)
-   - *Ranked Catalogue Table:* ~25 rows across Head, Torso, and Tail brands with interactive filters (Ad Status, Route, Category), multi-column sorting, and clickable rows opening Brand Detail.
-2. **Brand Detail:** Two-column deep dive for any brand:
-   - *Left (Why this brand):* Commerce metrics on BigBasket (GMV, conversion rate vs category average, 90-day search trend sparkline, category shelf share), ad history (with clear empty states for first-time advertisers), and algorithmic scoring input contribution bars.
-   - *Right (Generated Proposal):* An algorithmic offer with flight dates, placements, CPM/CPC pricing, estimated impressions, clicks, ROAS, and attributed GMV. Includes real-time inventory constraint callouts (e.g., *Homepage display: 94% sold — excluded from this package*) and one-click dispatch action buttons.
-3. **Pipeline:** A CRM pipeline with forecast totals (Target, Committed attainment bar, Best case, Pipeline totals), Kanban board by stage (*Identified → Contacted → Proposal sent → Negotiating → Closed won / Closed lost*), origin badges (*Generated* vs *Manual*), and a toggle to a sortable list view.
-4. **Routing Engine (Dispatch View):** 4-column architecture proving Maestro conducts rather than executes:
+   - *Ranked Catalogue Table:* ~25 rows across Head, Torso, and Tail brands with interactive filters (*Ad Status, Route, Category*), multi-column sorting, variant resolution (e.g. *Nestlé, Nestlé India, Maggi resolved to one row*), and clickable rows opening Brand Detail.
+2. **Brand Detail (Badge: `V1`, Adjust Loop: `Phase 2`):** Two-column deep dive:
+   - *Left (Why this brand):* BigBasket commerce signals (GMV, conversion rate vs category average, 90-day search trend sparkline, category shelf share), ad history (with clean empty state for never-advertised brands), and algorithmic scoring input contribution bars.
+   - *Right (Generated Proposal & The Adjust Interaction):*
+     - Live proposal card displaying package name, flight dates, placement, CPM/CPC rate, and calculated forecast.
+     - **The Adjust Interaction (`Phase 2`):** Swapping placements or adjusting budget updates availability, yield-derived price, and forecast in real time. For instance, selecting *Homepage Display Banner* immediately exposes:
+       > `Homepage display: 94% sold in this window — 2 of 21 slots available`
+     - **Handover State (`Brand accepted`):** Clicking `Brand accepted → Handover` flips the card to reveal the exact JSON payload handed to the Campaign API (`POST /api/v2/campaigns/provision`) with the caption:
+       > *"No AI in this step. Every decision was made during negotiation — the handover is a field mapping."*
+3. **Pipeline (Badge: `Phase 4`):** A recognisable CRM answering the stakeholder question:
+   - Forecast strip (*Target, Committed attainment bar, Best case, Pipeline totals*).
+   - 6-stage Kanban board (*Identified → Contacted → Proposal sent → Negotiating → Closed won / Closed lost*) with Indian rep names and `Generated` vs. `Manual` origin badges.
+   - Toggle to a sortable List View.
+4. **Routing Engine (Dispatch View — Badge: `Concept`):** 4-column architecture proving Maestro conducts rather than executes:
    - *Column 1 (Decisions):* Today's route decisions (12 named rep, 43 rep-assisted, 380 nurture, 1,240 self-serve).
    - *Column 2 (Destinations):* Downstream execution systems (*DemandWise*, *Brand Self-Serve*, *Sofie Media Planner*, *Named Reps*).
    - *Column 3 (What comes back):* Inbound sales tasks returning from DemandWise into the pipeline with the caption:

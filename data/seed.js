@@ -159,6 +159,7 @@ export const brands = [
   {
     id: 'nestle-maggi',
     name: 'Nestlé Maggi',
+    resolvedVariants: 'Resolved: Nestle · Nestlé India · Maggi',
     category: 'Snacks & Branded Foods',
     monthlyGMV: 96000000,
     searchTrend: -3,
