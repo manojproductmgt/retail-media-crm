@@ -24,9 +24,10 @@ const placementSpecs = {
     name: 'Grocery Search Top Slot',
     pricingModel: 'CPC',
     rate: 8,
-    isConstrained: false,
-    inventoryNote: null,
-    availabilityText: 'Search Top Slot: 38% unsold in this window — 8 of 21 slots open',
+    isConstrained: true,
+    isPurple: true,
+    availabilityLabel: 'Live Inventory Constraint',
+    availabilityText: 'Homepage display: 94% sold — excluded from this package',
     ctr: 0.04,
     baseROAS: 5.4,
   },
@@ -36,8 +37,9 @@ const placementSpecs = {
     pricingModel: 'CPM',
     rate: 220,
     isConstrained: true,
-    inventoryNote: 'Homepage display: 94% sold in this window — 2 of 21 slots available',
-    availabilityText: 'Homepage display: 94% sold in this window — 2 of 21 slots available',
+    isPurple: true,
+    availabilityLabel: 'Availability Constraint',
+    availabilityText: '94% sold in this window — 2 of 21 slots available',
     ctr: 0.015,
     baseROAS: 3.2,
   },
@@ -47,8 +49,9 @@ const placementSpecs = {
     pricingModel: 'CPC',
     rate: 6,
     isConstrained: false,
-    inventoryNote: null,
-    availabilityText: 'Cart Cross-sell: 55% unsold in this window — 12 of 21 slots available',
+    isPurple: false,
+    availabilityLabel: 'Inventory Allocation',
+    availabilityText: 'Cart cross-sell: 55% unsold in this window — 12 of 21 slots available',
     ctr: 0.05,
     baseROAS: 6.2,
   },
@@ -152,7 +155,6 @@ function showToast(message) {
     toast.style.fontSize = '13px';
     toast.style.fontWeight = '600';
     toast.style.zIndex = '999';
-    toast.style.boxShadow = '0 8px 24px rgba(0,0,0,0.5)';
     toast.style.transition = 'opacity 0.2s, transform 0.2s';
     document.body.appendChild(toast);
   }
@@ -204,12 +206,24 @@ function renderCoverageScreen() {
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
         <div>
           <div class="page-title">Coverage</div>
-          <div class="page-subtitle" style="margin-bottom:20px;">
-            Full catalogue opportunity radar & autonomous routing engine · 
-            <span style="color:var(--white);">North Star: conversion rate on generated opportunities</span>
+          <div class="page-subtitle" style="margin-bottom:16px;">
+            Full catalogue opportunity radar & autonomous routing engine
           </div>
         </div>
         <span class="scope-badge scope-badge-v1">V1</span>
+      </div>
+
+      <!-- North Star Callout Bar -->
+      <div class="north-star-bar">
+        <div class="north-star-badge-group">
+          <span class="north-star-badge"><span class="dot-mint"></span> North Star Metric</span>
+          <div class="north-star-metric">
+            Conversion Rate on Generated Opportunities: <span>2.8%</span>
+          </div>
+        </div>
+        <div class="north-star-caption">
+          <strong>47</strong> newly activated advertisers from <strong>1,675</strong> routed · Preferring activated revenue over raw pipeline volume
+        </div>
       </div>
 
       <!-- Top Stat Strip (Activation Led) -->
@@ -377,7 +391,7 @@ function renderBrandDetailScreen() {
         </button>
         <div style="display:flex; gap:8px;">
           <span class="scope-badge scope-badge-v1">V1</span>
-          <span class="scope-badge scope-badge-phase">Adjust loop: Phase 2</span>
+          <span class="scope-badge scope-badge-phase">Adjust loop is Phase 2</span>
         </div>
       </div>
 
@@ -578,7 +592,7 @@ function renderBrandDetailScreen() {
               <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
                 <div>
                   <span class="pill pill-generated" style="margin-bottom:6px;">Maestro Generated Proposal</span>
-                  <h3 class="offer-package-name">${generatedOffer.packageName}</h3>
+                  <h3 class="offer-package-name">${currentPlacementKey === 'search' ? generatedOffer.packageName : (currentPlacementKey === 'homepage' ? `${brand.name} Homepage Takeover — Festive Flight` : `${brand.name} Cart & Reorder Boost — 3-week`)}</h3>
                 </div>
                 <div style="text-align:right;">
                   <div style="font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">Agreed Budget</div>
@@ -659,21 +673,12 @@ function renderBrandDetailScreen() {
               </div>
 
               <!-- Live Inventory Line (Constrained by availability) -->
-              ${
-                currentSpec.isConstrained
-                  ? `
-                <div class="offer-inventory-note">
-                  <div style="font-weight:700; margin-bottom:2px;">Live Inventory Constraint</div>
-                  <div>${currentSpec.availabilityText}</div>
+              <div class="offer-inventory-note ${currentSpec.isPurple ? 'purple' : 'mint'}">
+                <span class="dot-dim" style="background:${currentSpec.isPurple ? 'var(--purple)' : 'var(--mint)'};"></span>
+                <div>
+                  <strong>${currentSpec.availabilityLabel}:</strong> ${currentSpec.availabilityText}
                 </div>
-              `
-                  : `
-                <div class="offer-inventory-note" style="background:rgba(79, 227, 193, 0.08); color:var(--mint);">
-                  <div style="font-weight:700; margin-bottom:2px;">Inventory Allocation Confirmed</div>
-                  <div>${currentSpec.availabilityText}</div>
-                </div>
-              `
-              }
+              </div>
 
               <!-- Performance Forecast -->
               <div class="offer-section">
@@ -750,23 +755,23 @@ function renderPipelineScreen() {
   return `
     <div class="screen-enter">
       <!-- Screen Header with View Toggle & Scope Badge -->
-      <div class="pipeline-header">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; flex-wrap:wrap; gap:16px;">
         <div>
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:4px;">
-            <div class="page-title" style="margin-bottom:0;">Pipeline</div>
-            <span class="scope-badge scope-badge-phase">Phase 4</span>
-          </div>
-          <div class="page-subtitle" style="margin-top:2px; margin-bottom:0;">
+          <div class="page-title" style="margin-bottom:4px;">Pipeline</div>
+          <div class="page-subtitle" style="margin-bottom:0;">
             Platform-generated ad sales deals & rep forecast · Deliberately post-V1
           </div>
         </div>
-        <div class="view-toggle">
-          <button class="view-toggle-btn ${state.pipelineView === 'kanban' ? 'active' : ''}" id="toggle-kanban">
-            Kanban
-          </button>
-          <button class="view-toggle-btn ${state.pipelineView === 'list' ? 'active' : ''}" id="toggle-list">
-            List view
-          </button>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div class="view-toggle">
+            <button class="view-toggle-btn ${state.pipelineView === 'kanban' ? 'active' : ''}" id="toggle-kanban">
+              Kanban
+            </button>
+            <button class="view-toggle-btn ${state.pipelineView === 'list' ? 'active' : ''}" id="toggle-list">
+              List view
+            </button>
+          </div>
+          <span class="scope-badge scope-badge-phase">Phase 4</span>
         </div>
       </div>
 
@@ -1215,17 +1220,17 @@ function bindBrandDetailEvents() {
 
   // Action buttons
   const actions = [
-    { id: 'btn-action-rep', label: 'Dispatched to Named Rep queue' },
-    { id: 'btn-action-nurture', label: 'Queued in DemandWise drip cohort' },
-    { id: 'btn-action-selfserve', label: 'Sent self-serve starter invite' },
+    { id: 'btn-action-rep', label: 'Dispatched to Named Rep queue', confirmText: '✓ Sent to Rep' },
+    { id: 'btn-action-nurture', label: 'Queued in DemandWise drip cohort', confirmText: '✓ Queued in Nurture' },
+    { id: 'btn-action-selfserve', label: 'Sent self-serve starter invite', confirmText: '✓ Invited to Self-Serve' },
   ];
 
-  actions.forEach(({ id, label }) => {
+  actions.forEach(({ id, label, confirmText }) => {
     const btn = document.getElementById(id);
     if (btn) {
       btn.addEventListener('click', () => {
         btn.classList.add('confirmed');
-        btn.innerHTML = `✓ Dispatched`;
+        btn.innerHTML = confirmText;
         showToast(label);
       });
     }

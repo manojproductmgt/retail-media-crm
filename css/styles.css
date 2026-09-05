@@ -205,6 +205,56 @@ button { cursor: pointer; font-family: var(--font); }
   border-color: var(--purple);
 }
 
+/* ── North Star Highlight Bar ──────────────────────────── */
+
+.north-star-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--navy-800);
+  border: 1px solid var(--mint);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.north-star-badge-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.north-star-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--mint-dim);
+  color: var(--mint);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.north-star-metric {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.north-star-metric span {
+  color: var(--mint);
+}
+
+.north-star-caption {
+  font-size: var(--fs-small);
+  color: var(--muted);
+}
+
 /* ── Stat Cards ────────────────────────────────────────── */
 
 .stat-strip {
@@ -628,12 +678,26 @@ button { cursor: pointer; font-family: var(--font); }
 
 .offer-inventory-note {
   margin-top: 16px;
-  padding: 10px 14px;
-  background: var(--purple-dim);
+  padding: 12px 14px;
   border-radius: var(--radius-sm);
   font-size: var(--fs-small);
-  color: var(--purple);
   font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.offer-inventory-note.purple {
+  background: var(--purple-dim);
+  border: 1px solid rgba(124, 108, 240, 0.4);
+  color: var(--purple);
+}
+
+.offer-inventory-note.mint {
+  background: var(--mint-dim);
+  border: 1px solid rgba(79, 227, 193, 0.4);
+  color: var(--mint);
 }
 
 .offer-actions {
@@ -668,14 +732,18 @@ button { cursor: pointer; font-family: var(--font); }
   cursor: default;
 }
 
-.offer-btn-primary {
+.offer-btn-primary,
+.offer-btn-accept {
   background: var(--mint);
   color: var(--navy-900);
   border-color: var(--mint);
+  font-weight: 700;
 }
 
-.offer-btn-primary:hover {
-  background: var(--mint-text);
+.offer-btn-primary:hover,
+.offer-btn-accept:hover {
+  background: #3BD4B0;
+  border-color: #3BD4B0;
   color: var(--navy-900);
 }
 
