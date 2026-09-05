@@ -516,6 +516,182 @@ button { cursor: pointer; font-family: var(--font); }
   color: var(--white);
 }
 
+/* ── Moment Strength & Why Now Cell ────────────────────── */
+
+.moment-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.moment-track {
+  width: 52px;
+  height: 6px;
+  background: var(--dim);
+  border-radius: 3px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.moment-fill {
+  height: 100%;
+  background: var(--mint);
+  border-radius: 3px;
+}
+
+.moment-val {
+  font-size: var(--fs-table);
+  font-weight: 700;
+  color: var(--white);
+  min-width: 22px;
+}
+
+.why-now-text {
+  font-size: var(--fs-small);
+  color: var(--white);
+  max-width: 240px;
+  line-height: 1.35;
+}
+
+.spend-cell {
+  text-align: right;
+}
+
+.spend-val {
+  font-weight: 700;
+  color: var(--white);
+  font-size: var(--fs-table);
+}
+
+.spend-sub {
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+
+.route-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.route-reasoning {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.25;
+  margin-top: 2px;
+  max-width: 230px;
+}
+
+.confidence-pill {
+  display: inline-block;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(124, 108, 240, 0.2);
+  color: var(--purple);
+  margin-top: 2px;
+}
+
+/* ── Gate Line & Two Clocks History ────────────────────── */
+
+.gate-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: rgba(79, 227, 193, 0.08);
+  border: 1px solid rgba(79, 227, 193, 0.3);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
+  color: var(--white);
+  margin-bottom: 16px;
+}
+
+.gate-line-icon {
+  color: var(--mint);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.routing-economics-box {
+  padding: 10px 14px;
+  background: var(--navy-700);
+  border: 1px solid var(--dim);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-small);
+  margin-top: 14px;
+  line-height: 1.4;
+}
+
+.opp-history-panel {
+  margin-top: 16px;
+}
+
+.opp-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--navy-700);
+  border: 1px solid var(--dim);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  font-size: var(--fs-small);
+}
+
+.opp-history-item:last-child {
+  margin-bottom: 0;
+}
+
+.opp-history-status {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-open {
+  color: var(--mint);
+}
+
+.status-won {
+  color: var(--purple);
+}
+
+.status-expired {
+  color: var(--muted);
+}
+
+.radar-mode-toggle {
+  display: inline-flex;
+  background: var(--navy-700);
+  border: 1px solid var(--dim);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.radar-mode-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.radar-mode-btn.active {
+  background: var(--navy-800);
+  color: var(--mint);
+}
+
 /* ── Brand Detail ──────────────────────────────────────── */
 
 .brand-detail-layout {
