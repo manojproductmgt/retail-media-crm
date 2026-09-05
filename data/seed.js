@@ -5,7 +5,7 @@
 // relationships.
 // ============================================================
 
-export const coverageStats = {
+const coverageStats = {
   newlyActivatedThisQuarter: 47,
   newlyActivatedLabel: 'brands advertising for the first time',
   activeAdvertisersDisplay: '61 → 108',
@@ -20,7 +20,7 @@ export const coverageStats = {
   planningWindow: 'Sep 1 – Sep 28, 2026 (Festive 4-week)',
 };
 
-export const categories = [
+const categories = [
   'Staples',
   'Snacks & Branded Foods',
   'Beverages',
@@ -31,7 +31,7 @@ export const categories = [
   'Gourmet',
 ];
 
-export const categoryBenchmarks = {
+const categoryBenchmarks = {
   'Dairy': { roasFloor: 2.0, roasBenchmark: 5.1, peerRatio: 0.025, unsoldSlack: '48% unsold', biddersPerSlot: 3.1, demandMovement: '+38%', gatePassed: true },
   'Snacks & Branded Foods': { roasFloor: 2.2, roasBenchmark: 4.8, peerRatio: 0.028, unsoldSlack: '42% unsold', biddersPerSlot: 3.4, demandMovement: '+34%', gatePassed: true },
   'Staples': { roasFloor: 2.0, roasBenchmark: 5.8, peerRatio: 0.015, unsoldSlack: '36% unsold', biddersPerSlot: 3.8, demandMovement: '+14%', gatePassed: true },
@@ -46,7 +46,7 @@ export const categoryBenchmarks = {
 // Contacts, ad history, cumulative spend, past campaigns, owning rep.
 // Accumulates and persists across planning cycles.
 
-export const brands = [
+const brands = [
   // ── HEAD — active advertisers, large ──
   {
     id: 'amul',
@@ -1186,7 +1186,7 @@ export const brands = [
 // Note: Same brand can appear in multiple categories (e.g. Amul in Dairy and Beverages, Tata Sampann in Staples and Snacks).
 // Also includes low-confidence demoted rows.
 
-export const openOpportunities = [
+const openOpportunities = [
   {
     id: 'opp-amul-dairy',
     brandId: 'amul',
@@ -2054,7 +2054,7 @@ export const openOpportunities = [
 
 // ── Cold Start Dataset (New Retailer Simulation) ─────────────
 // When a new retailer launches with zero historical ad spend or ROAS benchmarks.
-export const coldStartCatalogue = {
+const coldStartCatalogue = {
   totalBrands: 3140,
   unsoldSlotsTotal: '44% average unsold inventory',
   categories: [
@@ -2071,7 +2071,7 @@ export const coldStartCatalogue = {
 };
 
 // ── Pipeline Deals (Screen 3: Phase 4 CRM) ───────────────────
-export const pipelineDeals = [
+const pipelineDeals = [
   { id: 'd01', brandId: 'amul', brandName: 'Amul', value: 4200000, owner: 'Arjun Mehta', closeDate: '2026-10-15', stage: 'Negotiating', origin: 'Generated' },
   { id: 'd02', brandId: 'cadbury', brandName: 'Cadbury (Mondelez)', value: 4200000, owner: 'Vikram Patel', closeDate: '2026-10-05', stage: 'Proposal sent', origin: 'Generated' },
   { id: 'd03', brandId: 'britannia', brandName: 'Britannia', value: 3800000, owner: 'Priya Sharma', closeDate: '2026-10-20', stage: 'Negotiating', origin: 'Generated' },
@@ -2095,7 +2095,7 @@ export const pipelineDeals = [
 ];
 
 // ── Routing Engine Snapshot (Screen 4: Concept) ──────────────
-export const routingSnapshot = {
+const routingSnapshot = {
   date: '2026-09-05',
   decisions: {
     namedRep: 12,
@@ -2132,7 +2132,7 @@ export const routingSnapshot = {
     },
   ],
   inboundTasks: [
-    { brand: 'Sleepy Owl Coffee', action: 'Opened offer 3× in DemandWise but didn't buy — assign to rep', source: 'DemandWise', daysAgo: 1 },
+    { brand: 'Sleepy Owl Coffee', action: "Opened offer 3× in DemandWise but didn't buy — assign to rep", source: 'DemandWise', daysAgo: 1 },
     { brand: 'The Whole Truth', action: 'High organic GMV surge (+55%) during drip — upgrade to rep-assisted', source: 'DemandWise', daysAgo: 2 },
     { brand: 'Beyond Snack', action: 'Self-serve starter budget exhausted ₹25k — trigger rep re-pitch', source: 'Brand Self-Serve', daysAgo: 3 },
     { brand: 'Wingreens Farms', action: 'Replied to drip email asking for custom package — route to rep', source: 'DemandWise', daysAgo: 1 },
@@ -2157,7 +2157,7 @@ export const routingSnapshot = {
 };
 
 // ── Pipeline Forecast ────────────────────────────────────────
-export const pipelineForecast = {
+const pipelineForecast = {
   quarter: 'Q3 FY27',
   target: 32000000,
   committed: 12200000,
@@ -2166,26 +2166,53 @@ export const pipelineForecast = {
 };
 
 // ── Helpers ──────────────────────────────────────────────────
-export function getBrandById(id) {
+function getBrandById(id) {
   return brands.find(b => b.id === id) || null;
 }
 
-export function getOpportunityById(id) {
+function getOpportunityById(id) {
   return openOpportunities.find(o => o.id === id) || null;
 }
 
-export function formatINR(value) {
+function formatINR(value) {
   if (value >= 10000000) return `₹${(value / 10000000).toFixed(1)} Cr`;
   if (value >= 100000) return `₹${(value / 100000).toFixed(1)} L`;
   return `₹${value.toLocaleString('en-IN')}`;
 }
 
-export function formatINRFull(value) {
+function formatINRFull(value) {
   return `₹${value.toLocaleString('en-IN')}`;
 }
 
-export function formatDate(dateStr) {
+function formatDate(dateStr) {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+const MaestroData = {
+  coverageStats,
+  categories,
+  categoryBenchmarks,
+  brands,
+  openOpportunities,
+  coldStartCatalogue,
+  pipelineDeals,
+  routingSnapshot,
+  pipelineForecast,
+  getBrandById,
+  getOpportunityById,
+  formatINR,
+  formatINRFull,
+  formatDate,
+};
+
+if (typeof window !== 'undefined') {
+  window.MaestroData = MaestroData;
+}
+if (typeof globalThis !== 'undefined') {
+  globalThis.MaestroData = MaestroData;
+}
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = MaestroData;
 }

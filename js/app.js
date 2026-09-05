@@ -1,9 +1,12 @@
+(function() {
+"use strict";
+
 // ============================================================
 // Maestro — Interactive CRM Application
 // Pure vanilla JavaScript, no build step required.
 // ============================================================
 
-import {
+const {
   coverageStats,
   categories,
   categoryBenchmarks,
@@ -18,7 +21,7 @@ import {
   formatINR,
   formatINRFull,
   formatDate,
-} from '../data/seed.js';
+} = (typeof window !== 'undefined' && window.MaestroData) || (typeof globalThis !== 'undefined' && globalThis.MaestroData) || {};
 
 // ── Placement Specs for Live Adjust Interaction ──────────────
 
@@ -1484,3 +1487,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initNavigation();
   render();
 });
+
+})();
